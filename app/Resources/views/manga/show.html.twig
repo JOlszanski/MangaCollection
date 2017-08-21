@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Manga</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ manga.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ manga.title }}</td>
+            </tr>
+            <tr>
+                <th>Jptitle</th>
+                <td>{{ manga.jpTitle }}</td>
+            </tr>
+            <tr>
+                <th>Publisher</th>
+                <td>{{ manga.publisher }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ manga.status }}</td>
+            </tr>
+            <tr>
+                <th>Author</th>
+                <td>{{ manga.author }}</td>
+            </tr>
+            <tr>
+                <th>Cover</th>
+                <td>{{ manga.cover }}</td>
+            </tr>
+            <tr>
+                <th>Volumes</th>
+                <td>{{ manga.volumes|length }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('manga_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('manga_edit', { 'id': manga.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+        {% for volume in volumes %}
+            <div class="card" style="width: 20rem;">
+                <img class="card-img-top" src="..." alt="Card image cap">
+                <div class="card-body">
+                    <h4 class="card-title">{{ manga.title }} {{ volume.volumeNumber }}</h4>
+                    <p class="card-text">Release date: {{ volume.releaseDate|date("m/d/Y") }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+{% endblock %}

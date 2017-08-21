@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Mangas list</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+
+                <th>Title</th>
+                <th>Jptitle</th>
+                <th>Publisher</th>
+                <th>Status</th>
+                <th>Author</th>
+                <th>Cover</th>
+                <th>Volumes</th>
+                <th>Genres</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for manga in mangas %}
+            <tr>
+
+                <td>{{ manga.title }}</td>
+                <td>{{ manga.jpTitle }}</td>
+                <td>{{ manga.publisher }}</td>
+                <td>{{ manga.status }}</td>
+                <td>{{ manga.author }}</td>
+                <td>{{ manga.cover }}</td>
+                <td>{{ manga.volumes|length  }}</td>
+                <td>{% for genre in manga.genre %}
+                        {{ genre.genre }}
+                    {% endfor %}
+                </td>
+                <td>
+
+                            <a type="button" class="btn btn-outline-info" href="{{ path('manga_show', { 'id': manga.id }) }}">show</a>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <a type="button" class="btn btn-outline-warning" href="{{ path('manga_edit', { 'id': manga.id }) }}">edit</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('manga_new') }}">Create a new manga</a>
+        </li>
+    </ul>
+{% endblock %}
