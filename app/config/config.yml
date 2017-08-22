@@ -69,12 +69,18 @@ swiftmailer:
     password: '%mailer_password%'
     spool: { type: memory }
 
-# app/config/config.yml
+# FOSUSER Configuration
 fos_user:
-    db_driver: orm # other valid values are 'mongodb' and 'couchdb'
+    db_driver: orm
     firewall_name: main
     user_class: AppBundle\Entity\User
     from_email:
         address: admin@admin.com
         sender_name: admin
-
+# Vichi Configuration
+vich_uploader:
+    db_driver: orm
+    mappings:
+            covers:
+                uri_prefix:         '/covers'
+                upload_destination: '%kernel.root_dir%/../web/covers'

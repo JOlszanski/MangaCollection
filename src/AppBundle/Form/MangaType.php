@@ -7,6 +7,8 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class MangaType extends AbstractType
 {
@@ -20,7 +22,7 @@ class MangaType extends AbstractType
             ->add('publisher')
             ->add('status')
             ->add('author')
-            ->add('cover')
+            ->add('coverFile',VichFileType::class)
             ->add('genre',EntityType::class,array(
                 'class' => 'AppBundle\Entity\Genre',
                 'by_reference' => false,

@@ -27,7 +27,7 @@
                 <td>{{ manga.publisher }}</td>
                 <td>{{ manga.status }}</td>
                 <td>{{ manga.author }}</td>
-                <td>{{ manga.cover }}</td>
+                <td><img class="cover" src="{{ asset("covers/") ~ manga.cover  }}"></td>
                 <td>{{ manga.volumes|length  }}</td>
                 <td>{% for genre in manga.genre %}
                         {{ genre.genre }}
@@ -44,10 +44,11 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('manga_new') }}">Create a new manga</a>
-        </li>
-    </ul>
+    {% if is_granted('ROLE_ADMIN') %}
+        <ul>
+            <li>
+                <a href="{{ path('manga_new') }}">Create a new manga</a>
+            </li>
+        </ul>
+    {% endif %}
 {% endblock %}

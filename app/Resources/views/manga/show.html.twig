@@ -31,7 +31,7 @@
             </tr>
             <tr>
                 <th>Cover</th>
-                <td>{{ manga.cover }}</td>
+                <td></td>
             </tr>
             <tr>
                 <th>Volumes</th>
@@ -44,6 +44,7 @@
         <li>
             <a href="{{ path('manga_index') }}">Back to the list</a>
         </li>
+        {% if is_granted('ROLE_ADMIN') %}
         <li>
             <a href="{{ path('manga_edit', { 'id': manga.id }) }}">Edit</a>
         </li>
@@ -52,6 +53,7 @@
                 <input type="submit" value="Delete">
             {{ form_end(delete_form) }}
         </li>
+        {% endif %}
     </ul>
         {% for volume in volumes %}
             <div class="card" style="width: 20rem;">

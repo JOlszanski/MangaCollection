@@ -7,7 +7,9 @@ use AppBundle\Entity\Manga;
 use AppBundle\Entity\Volume;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Manga controller.
@@ -36,7 +38,7 @@ class MangaController extends Controller
 
     /**
      * Creates a new manga entity.
-     *
+     * @Security("is_granted('ROLE_ADMIN')")
      * @Route("/new", name="manga_new")
      * @Method({"GET", "POST"})
      */
@@ -86,6 +88,7 @@ class MangaController extends Controller
      *
      * @Route("/{id}/edit", name="manga_edit")
      * @Method({"GET", "POST"})
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function editAction(Request $request, Manga $manga)
     {
@@ -112,6 +115,7 @@ class MangaController extends Controller
      *
      * @Route("/{id}", name="manga_delete")
      * @Method("DELETE")
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     public function deleteAction(Request $request, Manga $manga)
     {
@@ -133,6 +137,7 @@ class MangaController extends Controller
      * @param Manga $manga The manga entity
      *
      * @return \Symfony\Component\Form\Form The form
+     * @Security("is_granted('ROLE_ADMIN')")
      */
     private function createDeleteForm(Manga $manga)
     {

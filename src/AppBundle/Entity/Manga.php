@@ -5,12 +5,16 @@ namespace AppBundle\Entity;
 use AppBundle\AppBundle;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Vich\UploaderBundle\Entity\File as EmbeddedFile;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Manga
  *
  * @ORM\Table(name="manga")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\MangaRepository")
+ * @Vich\Uploadable
  */
 class Manga
 {
@@ -74,6 +78,19 @@ class Manga
     private $cover;
 
     /**
+     * @Vich\UploadableField(mapping="covers", fileNameProperty="cover")
+     * @var File
+     */
+    private $coverFile;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+
+    /**
      * @ORM\OneToMany(targetEntity="Volume",mappedBy="manga")
      */
     private $volumes;
@@ -87,6 +104,11 @@ class Manga
         $this->genre = new ArrayCollection();
     }
 
+
+    public function __toString()
+    {
+        return (string)$this->genre;
+    }
 
     /**
      * Get id
@@ -243,7 +265,7 @@ class Manga
         return $this->genre;
     }
 
-    /**
+    /*
      * @return string
      */
     public function getCover()
@@ -289,6 +311,25 @@ class Manga
     public function setVolume($volume)
     {
         $this->volume = $volume;
+    }
+
+    /**
+     * @return File
+     */
+    public function getCoverFile()
+    {
+        return $this->coverFile;
+    }
+
+    /**
+     * @param File $coverFile
+     */
+    public function setCoverFile(File $coverFile = null)
+    {
+        $this->coverFile = $coverFile;
+        if($coverFile){
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
 }
