@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Volume
@@ -33,15 +34,14 @@ class Volume
      * @var int
      *
      * @ORM\Column(name="volumeNumber", type="integer")
+     *
+     * @Assert\Range(
+     *      min = 1,
+     *      minMessage = "Give number add least greater than {{ limit }}",
+     * )
      */
     private $volumeNumber;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="cover", type="string", length=255)
-     */
-    private $cover;
 
     /**
      * @var \DateTime
@@ -134,6 +134,14 @@ class Volume
     public function getReleaseDate()
     {
         return $this->releaseDate;
+    }
+
+    /**
+     * @param mixed $manga
+     */
+    public function setManga($manga)
+    {
+        $this->manga = $manga;
     }
 }
 

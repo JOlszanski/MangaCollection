@@ -9,6 +9,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Vich\UploaderBundle\Entity\File as EmbeddedFile;
 use Symfony\Component\HttpFoundation\File\File;
 
+
 /**
  * Manga
  *
@@ -332,4 +333,27 @@ class Manga
         }
     }
 
+    /**
+     * @param Volume $volume
+     *
+     * Adds volume to manga
+     */
+    public function addVolume(Volume $volume)
+    {
+        $volume->setManga($this);
+        if($this->volumes->contains($volume)){
+            $this->volumes->add($volume);
+        }
+    }
+
+    /**
+     * @param Volume $volume
+     *
+     * Removes volume form manga
+     */
+    public function removeVolume(Volume $volume)
+    {
+        $volume->setManga(null);
+        $this->volumes->removeElement($volume);
+    }
 }

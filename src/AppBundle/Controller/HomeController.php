@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
  * @package AppBundle\Controller
  * @Method({"GET", "POST"})
  */
-class HomeControllerController extends Controller
+class HomeController extends Controller
 {
     /**
      * @Route("/", name="home")

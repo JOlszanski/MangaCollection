@@ -5,10 +5,12 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Genre;
 use AppBundle\Entity\Manga;
 use AppBundle\Entity\Volume;
+use AppBundle\Form\VolumeType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -72,6 +74,7 @@ class MangaController extends Controller
     public function showAction(Manga $manga)
     {
         $deleteForm = $this->createDeleteForm($manga);
+
 
         $repository = $this->getDoctrine()->getRepository(Volume::class);
         $volumes = $repository->findByManga($manga);
@@ -146,5 +149,100 @@ class MangaController extends Controller
             ->setMethod('DELETE')
             ->getForm()
         ;
+    }
+
+
+    /**
+     * @Route("/volume/{id}/new", name="volume_new")
+     * @Method("POST")
+     * @Security("is_granted('ROLE_ADMIN')")
+     * @ParamConverter("manga", class="AppBundle:Manga")
+     *
+     * Method adds new volume to manga
+     */
+    public function volumeNewAction(Request $request,$manga){
+
+        $volume = new Volume();
+        $manga->addVolume($volume);
+
+        $form = $this->createForm(VolumeType::class,$volume);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($volume);
+            $em->flush();
+
+            return $this->redirectToRoute("manga_show",['id' => $manga->getId()]);
+        }
+
+        return $this->render("manga/volume_form_error.html.twig",[
+            'manga' => $manga,
+            'form' => $form->createView(),
+        ]);
+
+    }
+    /**
+    *
+    * @param Manga $manga
+    *
+    * @return Response
+    */
+    public function volumeFormAction(Manga $manga)
+    {
+        $form = $this->createForm(VolumeType::class);
+        return $this->render('manga/_volume_form.html.twig', [
+            'manga' => $manga,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param Manga $manga
+     * @param Volume $volume
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function volumeShowAction(Request $request,Manga $manga,Volume $volume)
+    {
+        $deleteForm = $this->createVolumeDeleteForm($volume);
+        return $this->render('manga/_volume_card.html.twig',[
+           'volume_delete_form' => $deleteForm->createView(),
+            'manga' => $manga,
+            'volume' =>$volume
+        ]);
+    }
+    /**
+     * Deletes a volume entity.
+     *
+     * @Route("/volume/{id}", name="volume_delete")
+     * @Method("DELETE")
+     * @Security("is_granted('ROLE_ADMIN')")
+     */
+    public function deleteVolumeAction(Request $request, Volume $volume)
+    {
+        $form = $this->createVolumeDeleteForm($volume);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($volume);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('manga_index');
+    }
+
+    /**
+     * @param Volume $volume
+     * @return \Symfony\Component\Form\Form|\Symfony\Component\Form\FormInterface
+     */
+    private function createVolumeDeleteForm(Volume $volume)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('volume_delete', array('id' => $volume->getId())))
+            ->setMethod('DELETE')
+            ->getForm()
+            ;
     }
 }

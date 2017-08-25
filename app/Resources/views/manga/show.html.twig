@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+ {{ manga.title }}
+{% endblock %}
+
 {% block body %}
     <h1>Manga</h1>
 
@@ -56,13 +60,10 @@
         {% endif %}
     </ul>
         {% for volume in volumes %}
-            <div class="card" style="width: 20rem;">
-                <img class="card-img-top" src="..." alt="Card image cap">
-                <div class="card-body">
-                    <h4 class="card-title">{{ manga.title }} {{ volume.volumeNumber }}</h4>
-                    <p class="card-text">Release date: {{ volume.releaseDate|date("m/d/Y") }}</p>
-                </div>
-            </div>
+            {{ render(controller('AppBundle:manga:volumeShow', {'manga': manga, 'volume': volume})) }}
         {% endfor %}
 
+        {% if is_granted('ROLE_ADMIN') %}
+            {{ render(controller('AppBundle:manga:volumeForm', {'manga': manga})) }}
+        {% endif %}
 {% endblock %}
