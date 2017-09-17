@@ -28,6 +28,7 @@ class Genre
      * @ORM\Column(name="genre", type="string", length=255)
      */
     private $genre;
+
     /**
      * var string
      *

@@ -19,7 +19,7 @@ framework:
     form: ~
     csrf_protection: ~
     validation: { enable_annotations: true }
-    #serializer: { enable_annotations: true }
+    serializer: { enable_annotations: true }
     templating:
         engines: ['twig']
     default_locale: '%locale%'
@@ -77,10 +77,4 @@ fos_user:
     from_email:
         address: admin@admin.com
         sender_name: admin
-# Vichi Configuration
-vich_uploader:
-    db_driver: orm
-    mappings:
-            covers:
-                uri_prefix:         '/covers'
-                upload_destination: '%kernel.root_dir%/../web/covers'
+

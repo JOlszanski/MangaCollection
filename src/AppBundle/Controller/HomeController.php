@@ -19,9 +19,7 @@ class HomeController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('AppBundle:HomeController:index.html.twig', array(
-            // ...
-        ));
+        return $this->redirectToRoute('manga_index');
     }
 
 }

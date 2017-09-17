@@ -25,7 +25,6 @@ class Volume
 
     /**
      *
-     *
      * @ORM\ManyToOne(targetEntity="Manga",inversedBy="volumes")
      */
     private $manga;
@@ -43,12 +42,13 @@ class Volume
     private $volumeNumber;
 
 
+
     /**
-     * @var \DateTime
+     * var \DateTime
      *
-     * @ORM\Column(name="release_date", type="datetime")
+     * ORM\Column(name="release_date", type="datetime")
      */
-    private $releaseDate;
+    #private $releaseDate;
 
     public function __toString() {
         return (string) $this->volumeNumber;
@@ -88,29 +88,7 @@ class Volume
         return $this->volumeNumber;
     }
 
-    /**
-     * Set cover
-     *
-     * @param string $cover
-     *
-     * @return Volume
-     */
-    public function setCover($cover)
-    {
-        $this->cover = $cover;
 
-        return $this;
-    }
-
-    /**
-     * Get cover
-     *
-     * @return string
-     */
-    public function getCover()
-    {
-        return $this->cover;
-    }
 
     /**
      * Set releaseDate
@@ -126,16 +104,16 @@ class Volume
         return $this;
     }
 
-    /**
+    /*
      * Get releaseDate
      *
      * @return \DateTime
-     */
+
     public function getReleaseDate()
     {
         return $this->releaseDate;
     }
-
+    */
     /**
      * @param mixed $manga
      */
@@ -143,5 +121,7 @@ class Volume
     {
         $this->manga = $manga;
     }
+
+
 }
 

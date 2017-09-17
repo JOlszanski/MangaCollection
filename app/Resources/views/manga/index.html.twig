@@ -13,10 +13,10 @@
 
                 <th>Title</th>
                 <th>Jptitle</th>
+                <th>Owner</th>
                 <th>Publisher</th>
                 <th>Status</th>
                 <th>Author</th>
-                <th>Cover</th>
                 <th>Volumes</th>
                 <th>Genres</th>
                 <th>Actions</th>
@@ -28,10 +28,10 @@
 
                 <td>{{ manga.title }}</td>
                 <td>{{ manga.jpTitle }}</td>
+                <td>{{ manga.user.username }}</td>
                 <td>{{ manga.publisher }}</td>
                 <td>{{ manga.status }}</td>
                 <td>{{ manga.author }}</td>
-                <td><img class="cover" src="{{ asset("covers/") ~ manga.cover  }}"></td>
                 <td>{{ manga.volumes|length  }}</td>
                 <td>{% for genre in manga.genre %}
                         {{ genre.genre }}
@@ -40,7 +40,7 @@
                 <td>
 
                             <a type="button" class="btn btn-outline-info" href="{{ path('manga_show', { 'id': manga.id }) }}">show</a>
-                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    {% if is_granted('edit',manga) %}
                             <a type="button" class="btn btn-outline-warning" href="{{ path('manga_edit', { 'id': manga.id }) }}">edit</a>
                     {% endif %}
                 </td>
@@ -48,7 +48,7 @@
         {% endfor %}
         </tbody>
     </table>
-    {% if is_granted('ROLE_ADMIN') %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         <ul>
             <li>
                 <a href="{{ path('manga_new') }}">Create a new manga</a>

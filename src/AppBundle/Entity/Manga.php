@@ -5,6 +5,8 @@ namespace AppBundle\Entity;
 use AppBundle\AppBundle;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn as JoinColumn;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Vich\UploaderBundle\Entity\File as EmbeddedFile;
 use Symfony\Component\HttpFoundation\File\File;
@@ -15,7 +17,6 @@ use Symfony\Component\HttpFoundation\File\File;
  *
  * @ORM\Table(name="manga")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\MangaRepository")
- * @Vich\Uploadable
  */
 class Manga
 {
@@ -27,6 +28,13 @@ class Manga
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="mangas")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+
+    private $user;
 
     /**
      * @var string
@@ -71,28 +79,9 @@ class Manga
      */
     private $genre;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="cover", type="string", length=255)
-     */
-    private $cover;
 
     /**
-     * @Vich\UploadableField(mapping="covers", fileNameProperty="cover")
-     * @var File
-     */
-    private $coverFile;
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @var \DateTime
-     */
-    private $updatedAt;
-
-
-    /**
-     * @ORM\OneToMany(targetEntity="Volume",mappedBy="manga")
+     * @ORM\OneToMany(targetEntity="Volume",mappedBy="manga",cascade={"remove"})
      */
     private $volumes;
 
@@ -103,6 +92,8 @@ class Manga
     {
 
         $this->genre = new ArrayCollection();
+        #$this->user = new ArrayCollection();
+        #$this->updatedAt = new DateTime();
     }
 
 
@@ -266,21 +257,6 @@ class Manga
         return $this->genre;
     }
 
-    /*
-     * @return string
-     */
-    public function getCover()
-    {
-        return $this->cover;
-    }
-
-    /**
-     * @param string $cover
-     */
-    public function setCover($cover)
-    {
-        $this->cover = $cover;
-    }
 
     /**
      * @return int
@@ -356,4 +332,41 @@ class Manga
         $volume->setManga(null);
         $this->volumes->removeElement($volume);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    public function addUser(User $user)
+    {
+        $this->user = $user;
+        $user->addManga($this);
+    }
+
+    public function getOwner()
+    {
+        return $this->user;
+    }
+    /**
+     * Is the given User the author of this Post?
+     *
+     * @return bool
+     */
+    public function isAuthor(User $user = null)
+    {
+        return $user && $user->getId() == $this->getUser()->getId();
+    }
+
 }

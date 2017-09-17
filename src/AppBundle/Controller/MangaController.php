@@ -4,8 +4,10 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Genre;
 use AppBundle\Entity\Manga;
+use AppBundle\Entity\User;
 use AppBundle\Entity\Volume;
 use AppBundle\Form\VolumeType;
+//use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -31,7 +33,16 @@ class MangaController extends Controller
 
         $em = $this->getDoctrine()->getManager();
 
-        $mangas = $em->getRepository('AppBundle:Manga')->findAll();
+        $user = $this->getUser();
+
+        if($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+           $mangas = $em->getRepository('AppBundle:Manga')->findByUser($user);
+        }
+        else{
+            $mangas = $em->getRepository('AppBundle:Manga')->findAll();
+        }
+
+
 
         return $this->render('manga/index.html.twig', array(
             'mangas' => $mangas,
@@ -40,7 +51,7 @@ class MangaController extends Controller
 
     /**
      * Creates a new manga entity.
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      * @Route("/new", name="manga_new")
      * @Method({"GET", "POST"})
      */
@@ -53,6 +64,7 @@ class MangaController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
+            $manga->addUser($this->getUser());
             $em->persist($manga);
             $em->flush();
 
@@ -75,7 +87,6 @@ class MangaController extends Controller
     {
         $deleteForm = $this->createDeleteForm($manga);
 
-
         $repository = $this->getDoctrine()->getRepository(Volume::class);
         $volumes = $repository->findByManga($manga);
 
@@ -87,14 +98,29 @@ class MangaController extends Controller
     }
 
     /**
+     * @Route("/manga/all", name="manga_all_index")
+     * @Method({"GET", "POST"})
+     */
+    public function allIndexAction()
+    {
+        $repository = $this->getDoctrine()->getManager()->getRepository(Manga::class);
+        $mangas = $repository->findAll();
+
+        return $this->render('manga/index.html.twig', array(
+            'mangas' => $mangas,
+        ));
+    }
+    /**
      * Displays a form to edit an existing manga entity.
      *
      * @Route("/{id}/edit", name="manga_edit")
      * @Method({"GET", "POST"})
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('edit', manga)")
      */
     public function editAction(Request $request, Manga $manga)
     {
+        #$this->denyAccessUnlessGranted('edit',$manga);
+
         $deleteForm = $this->createDeleteForm($manga);
         $editForm = $this->createForm('AppBundle\Form\MangaType', $manga);
         $editForm->handleRequest($request);
@@ -118,7 +144,7 @@ class MangaController extends Controller
      *
      * @Route("/{id}", name="manga_delete")
      * @Method("DELETE")
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('edit', manga)")
      */
     public function deleteAction(Request $request, Manga $manga)
     {
@@ -127,6 +153,7 @@ class MangaController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            $manga->setUser(null);
             $em->remove($manga);
             $em->flush();
         }
@@ -140,7 +167,7 @@ class MangaController extends Controller
      * @param Manga $manga The manga entity
      *
      * @return \Symfony\Component\Form\Form The form
-     * @Security("is_granted('ROLE_ADMIN')")
+     *
      */
     private function createDeleteForm(Manga $manga)
     {
@@ -155,7 +182,7 @@ class MangaController extends Controller
     /**
      * @Route("/volume/{id}/new", name="volume_new")
      * @Method("POST")
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('edit', manga)")
      * @ParamConverter("manga", class="AppBundle:Manga")
      *
      * Method adds new volume to manga
@@ -163,13 +190,16 @@ class MangaController extends Controller
     public function volumeNewAction(Request $request,$manga){
 
         $volume = new Volume();
-        $manga->addVolume($volume);
+
 
         $form = $this->createForm(VolumeType::class,$volume);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()){
             $em = $this->getDoctrine()->getManager();
+
+            $manga->addVolume($volume);
+
             $em->persist($volume);
             $em->flush();
 
@@ -217,7 +247,7 @@ class MangaController extends Controller
      *
      * @Route("/volume/{id}", name="volume_delete")
      * @Method("DELETE")
-     * @Security("is_granted('ROLE_ADMIN')")
+     * @Security("is_granted('edit', manga)")
      */
     public function deleteVolumeAction(Request $request, Volume $volume)
     {
