@@ -2,15 +2,8 @@
 
 namespace AppBundle\Entity;
 
-use AppBundle\AppBundle;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\JoinColumn as JoinColumn;
-use Symfony\Component\Validator\Constraints\DateTime;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Vich\UploaderBundle\Entity\File as EmbeddedFile;
-use Symfony\Component\HttpFoundation\File\File;
-
 
 /**
  * Manga
@@ -30,13 +23,6 @@ class Manga
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="mangas")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
-
-    private $user;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
@@ -46,60 +32,49 @@ class Manga
     /**
      * @var string
      *
-     * @ORM\Column(name="jp_title", type="string", length=255)
+     * @ORM\Column(name="author", type="string", length=255)
      */
-    private $jpTitle;
+    private $author;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="publisher", type="string", length=255)
-     */
-    private $publisher;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="status", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="Status", inversedBy="mangas")
+     * @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      */
     private $status;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="author", type="string", length=255)
+     * @ORM\Column(name="views", type="string", length=255, options={"default" : 0})
      */
-    private $author;
+    private $views;
 
     /**
-     * var string
-     *
-     * ORM\Column(name="genre", type="string", length=255)
-     * @ORM\ManyToMany(targetEntity="Genre", inversedBy="manga")
+     * @ORM\ManyToMany(targetEntity="Genre", inversedBy="mangas")
      */
-    private $genre;
-
+    private $genres;
 
     /**
-     * @ORM\OneToMany(targetEntity="Volume",mappedBy="manga",cascade={"remove"})
+     * @ORM\Column(name="crawler_url", type="string", length=255)
+     */
+    private $url;
+
+    /**
+
+     * @ORM\OneToMany(targetEntity="Volume", mappedBy="manga",cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="manga_id", referencedColumnName="id")
      */
     private $volumes;
-
     /**
      * Manga constructor.
      */
     public function __construct()
     {
-
-        $this->genre = new ArrayCollection();
-        #$this->user = new ArrayCollection();
-        #$this->updatedAt = new DateTime();
-    }
-
-
-    public function __toString()
-    {
-        return (string)$this->genre;
+        $this->genres = new ArrayCollection();
+        $this->volumes = new ArrayCollection();
+        $this->views = 0;
     }
 
     /**
@@ -137,51 +112,27 @@ class Manga
     }
 
     /**
-     * Set jpTitle
+     * Set author
      *
-     * @param string $jpTitle
+     * @param string $author
      *
      * @return Manga
      */
-    public function setJpTitle($jpTitle)
+    public function setAuthor($author)
     {
-        $this->jpTitle = $jpTitle;
+        $this->author = $author;
 
         return $this;
     }
 
     /**
-     * Get jpTitle
+     * Get author
      *
      * @return string
      */
-    public function getJpTitle()
+    public function getAuthor()
     {
-        return $this->jpTitle;
-    }
-
-    /**
-     * Set publisher
-     *
-     * @param string $publisher
-     *
-     * @return Manga
-     */
-    public function setPublisher($publisher)
-    {
-        $this->publisher = $publisher;
-
-        return $this;
-    }
-
-    /**
-     * Get publisher
-     *
-     * @return string
-     */
-    public function getPublisher()
-    {
-        return $this->publisher;
+        return $this->author;
     }
 
     /**
@@ -209,164 +160,117 @@ class Manga
     }
 
     /**
-     * Set author
+     * Set views
      *
-     * @param string $author
+     * @param string $views
      *
      * @return Manga
      */
-    public function setAuthor($author)
+    public function setViews($views)
     {
-        $this->author = $author;
+        $this->views = $views;
 
         return $this;
     }
 
     /**
-     * Get author
+     * Get views
      *
      * @return string
      */
-    public function getAuthor()
+    public function getViews()
     {
-        return $this->author;
+        return $this->views;
     }
 
     /**
-     * Set genre
-     *
-     * @param string $genre
-     *
-     * @return Manga
+     * @return mixed
      */
-    public function setGenre($genre)
+    public function getGenres()
     {
-        $this->genre = $genre;
-
-        return $this;
+        return $this->genres;
     }
 
     /**
-     * Get genre
-     *
-     * @return string
+     * @param mixed $genres
      */
-    public function getGenre()
+    public function setGenres($genres)
     {
-
-        return $this->genre;
+        $this->genres = $genres;
     }
 
+    /**
+     * @param Genre $genre
+     */
+    public function addGenre(Genre $genre)
+    {
+        $genre->addManga($this);
+        $this->genres[] = $genre;
+    }
+
+    public function addGenres(?array $genres)
+    {
+        if(is_null($genres)) return null;
+        foreach ($genres as $genre)
+        {
+            $genre->addManga($this);
+            $this->genres[] = $genre;
+        }
+
+    }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getVolumes()
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param mixed $url
+     */
+    public function setUrl($url):void
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * @param Status $status
+     */
+    public function addStatus(Status $status):void
+    {
+        $status->addManga($this);
+        $this->status = $status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVolumes(): array
     {
         return $this->volumes;
     }
 
     /**
-     * @param int $volumes
+     *
+     * @param Volume $volume
      */
-    public function setVolumes($volumes)
+    public function addVolume(Volume $volume): void
     {
-        $this->volumes = $volumes;
+        $this->volumes[] = $volume;
     }
 
     /**
-     * @return mixed
+     * @param array $volumes
      */
-    public function getVolume()
+    public function addVolumes(array $volumes):void
     {
-        return $this->volume;
-    }
-
-    /**
-     * @param mixed $volume
-     */
-    public function setVolume($volume)
-    {
-        $this->volume = $volume;
-    }
-
-    /**
-     * @return File
-     */
-    public function getCoverFile()
-    {
-        return $this->coverFile;
-    }
-
-    /**
-     * @param File $coverFile
-     */
-    public function setCoverFile(File $coverFile = null)
-    {
-        $this->coverFile = $coverFile;
-        if($coverFile){
-            $this->updatedAt = new \DateTime('now');
+        foreach ($volumes as $volume)
+        {
+            $volume->setManga($this);
+            $this->volumes[] = $volume;
         }
     }
-
-    /**
-     * @param Volume $volume
-     *
-     * Adds volume to manga
-     */
-    public function addVolume(Volume $volume)
-    {
-        $volume->setManga($this);
-        if($this->volumes->contains($volume)){
-            $this->volumes->add($volume);
-        }
-    }
-
-    /**
-     * @param Volume $volume
-     *
-     * Removes volume form manga
-     */
-    public function removeVolume(Volume $volume)
-    {
-        $volume->setManga(null);
-        $this->volumes->removeElement($volume);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param mixed $user
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    public function addUser(User $user)
-    {
-        $this->user = $user;
-        $user->addManga($this);
-    }
-
-    public function getOwner()
-    {
-        return $this->user;
-    }
-    /**
-     * Is the given User the author of this Post?
-     *
-     * @return bool
-     */
-    public function isAuthor(User $user = null)
-    {
-        return $user && $user->getId() == $this->getUser()->getId();
-    }
-
 }
+

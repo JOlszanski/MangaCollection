@@ -5,15 +5,12 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Genre;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Genre controller.
  *
  * @Route("genre")
- * @Security("is_granted('ROLE_ADMIN')")
  */
 class GenreController extends Controller
 {

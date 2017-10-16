@@ -1,58 +1,54 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Manga List
+    Manga list
 {% endblock %}
-
 {% block body %}
-    <h1>Mangas list</h1>
+    <div class="container-fluid">
+        <h1>Mangas list</h1>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-primary" href="{{ path('manga_new') }}">{{ "manga.createNew"|trans({}, 'manga') }}</a>
+        {% endif %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>{{ "manga.title"|trans({}, 'manga') }}</th>
+                    <th>{{ "manga.author"|trans({}, 'manga') }}</th>
+                    <th>{{ "manga.status"|trans({}, 'manga') }}</th>
+                    <th>{{ "manga.views"|trans({}, 'manga') }}</th>
+                    <th>{{ "manga.action"|trans({}, 'manga') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for manga in mangas %}
+                <tr>
+                    <td><a href="{{ path('manga_show', { 'id': manga.id }) }}">{{ manga.id }}</a></td>
+                    <td>{{ manga.title }}</td>
+                    <td>{{ manga.author }}</td>
+                    <td>{{ manga.status }}</td>
+                    <td>{{ manga.views }}</td>
+                    <td>
+                        <ul>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li>
+                                    <a href="{{ path('manga_edit', { 'id': manga.id }) }}">edit</a>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <a href="{{ path('manga_show', { 'id': manga.id }) }}">show</a>
+                            </li>
 
-                <th>Title</th>
-                <th>Jptitle</th>
-                <th>Owner</th>
-                <th>Publisher</th>
-                <th>Status</th>
-                <th>Author</th>
-                <th>Volumes</th>
-                <th>Genres</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for manga in mangas %}
-            <tr>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-                <td>{{ manga.title }}</td>
-                <td>{{ manga.jpTitle }}</td>
-                <td>{{ manga.user.username }}</td>
-                <td>{{ manga.publisher }}</td>
-                <td>{{ manga.status }}</td>
-                <td>{{ manga.author }}</td>
-                <td>{{ manga.volumes|length  }}</td>
-                <td>{% for genre in manga.genre %}
-                        {{ genre.genre }}
-                    {% endfor %}
-                </td>
-                <td>
 
-                            <a type="button" class="btn btn-outline-info" href="{{ path('manga_show', { 'id': manga.id }) }}">show</a>
-                    {% if is_granted('edit',manga) %}
-                            <a type="button" class="btn btn-outline-warning" href="{{ path('manga_edit', { 'id': manga.id }) }}">edit</a>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-        <ul>
-            <li>
-                <a href="{{ path('manga_new') }}">Create a new manga</a>
-            </li>
-        </ul>
-    {% endif %}
+
+
+    </div>
 {% endblock %}

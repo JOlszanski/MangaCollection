@@ -1,12 +1,10 @@
 <?php
 
-// src/AppBundle/Entity/User.php
-
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -22,64 +20,57 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @var String
-     *
-     * @ORM\Column(name="nickname", type="string", length=255)
+     * @ORM\ManyToMany(targetEntity="Volume", inversedBy="users",cascade={"persist"}, orphanRemoval=true)
      */
-    protected $nickname;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Manga", mappedBy="user")
-     */
-    private $mangas;
-
-
+    private $volumes;
 
     public function __construct()
     {
         parent::__construct();
-        $this->mangas = new ArrayCollection();
+        $this->volumes = new ArrayCollection();
     }
 
     /**
      * @return mixed
      */
-    public function getMangas()
+    public function getVolumes()
     {
-        return $this->mangas;
+        return $this->volumes;
     }
 
     /**
-     * @param mixed $mangas
+     * @param mixed $volumes
      */
-    public function setMangas($mangas)
+    public function setVolumes($volumes): void
     {
-        $this->mangas = $mangas;
+        $this->volumes = $volumes;
     }
 
-    /**
-     * @param Manga $manga
-     */
-    public function addManga(Manga $manga)
+    public function addVolume(Volume $volume):void
     {
-        $this->mangas[] = $manga;
+        $volume->addUser($this);
+        $this->volumes[] = $volume;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNickname()
+    public function haveVolume(Volume $volume)
     {
-        return $this->nickname;
+        foreach ($this->volumes as $v){
+            if ($v == $volume) return true;
+        }
+        return false;
     }
 
-    /**
-     * @param mixed $nickname
-     */
-    public function setNickname($nickname)
+    public function popVolume(Volume $volume)
     {
-        $this->nickname = $nickname;
+
+        if(!$this->volumes->contains($volume))return;
+        $newVolumes = new ArrayCollection();
+        foreach ($this->volumes as $DbVolume)
+        {
+            if ($DbVolume != $volume) $newVolumes[] = $DbVolume;
+        }
+        $this->volumes = $newVolumes;
+        #$this->volumes->removeElement($volume);
+        $volume->popUser($this);
     }
-
-
 }

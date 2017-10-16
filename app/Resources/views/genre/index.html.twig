@@ -7,7 +7,7 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Genre</th>
+                <th>Name</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -15,7 +15,7 @@
         {% for genre in genres %}
             <tr>
                 <td><a href="{{ path('genre_show', { 'id': genre.id }) }}">{{ genre.id }}</a></td>
-                <td>{{ genre.genre }}</td>
+                <td>{{ genre.name }}</td>
                 <td>
                     <ul>
                         <li>

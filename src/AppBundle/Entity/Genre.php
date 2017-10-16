@@ -25,77 +25,98 @@ class Genre
     /**
      * @var string
      *
-     * @ORM\Column(name="genre", type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255, unique=true)
      */
-    private $genre;
+    private $name;
 
     /**
-     * var string
+     * @var array
      *
-     * ORM\Column(name="genre", type="string", length=255)
-     * @ORM\ManyToMany(targetEntity="Manga", mappedBy="genre")
+     * @ORM\ManyToMany(targetEntity="Language", mappedBy="genres")
      */
-    private $manga;
+    private $language;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Manga", mappedBy="genres")
+     */
+    private $mangas;
 
     /**
      * Genre constructor.
      */
     public function __construct()
     {
-        $this->manga = new ArrayCollection();
+        $this->mangas = new ArrayCollection();
+        $this->language = new ArrayCollection();
     }
 
-    public function __toString() {
-        return $this->genre;
-    }
     /**
      * Get id
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * Set genre
+     * Set name
      *
-     * @param string $genre
+     * @param string $name
      *
      * @return Genre
      */
-    public function setGenre($genre)
+    public function setName($name): self
     {
-        $this->genre = $genre;
+        $this->name = $name;
 
         return $this;
     }
 
     /**
-     * Get genre
+     * Get name
      *
      * @return string
      */
-    public function getGenre()
+    public function getName(): ?string
     {
-        return $this->genre;
+        return $this->name;
     }
 
     /**
      * @return mixed
      */
-    public function getManga()
+    public function getMangas()
     {
-        return $this->manga;
+        return $this->mangas;
     }
 
     /**
-     * @param mixed $manga
+     * @param mixed $mangas
      */
-    public function setManga($manga)
+    public function setMangas($mangas)
     {
-        $this->manga = $manga;
+        $this->mangas = $mangas;
     }
+
+    /**
+     * @param Manga $manga
+     */
+    public function addManga(Manga $manga): void
+    {
+        $this->mangas[] = $manga;
+    }
+
+    /**
+     * @param Language $language
+     */
+    public function addLanguage(Language $language): void
+    {
+        /** @var Language $language */
+        $language->addGenre($this);
+        $this->language[] = $language;
+    }
+
 }
 

@@ -4,22 +4,15 @@ namespace AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
-/**
- * Class HomeControllerController
- * @package AppBundle\Controller
- * @Method({"GET", "POST"})
- */
 class HomeController extends Controller
 {
     /**
-     * @Route("/", name="home")
-     *
+     * @Route("/", name="homepage")
      */
     public function indexAction()
     {
-        return $this->redirectToRoute('manga_index');
+        return $this->render('AppBundle:Home:index.html.twig');
     }
 
 }

@@ -4,11 +4,6 @@ parameters:
     #parameter_name: value
 
 services:
-    #Serialazer
-    get_set_method_normalizer:
-        class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
-        public: false
-        tags: [serializer.normalizer]
     # default configuration for services in *this* file
     _defaults:
         # automatically injects dependencies in your services
@@ -38,3 +33,7 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+    AppBundle\Service\CrawlerResolver:
+        public: true
+    AppBundle\Service:
+            public: true

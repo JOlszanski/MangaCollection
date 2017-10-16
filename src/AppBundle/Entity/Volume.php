@@ -2,8 +2,9 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Volume
@@ -22,36 +23,38 @@ class Volume
      */
     private $id;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="number", type="integer")
+     */
+    private $number;
 
     /**
+     * @var \DateTime
      *
-     * @ORM\ManyToOne(targetEntity="Manga",inversedBy="volumes")
+     * @ORM\Column(name="releaseDate", type="datetime", nullable=true)
+     */
+    private $releaseDate;
+
+    /**
+     * @var string
+     *
+     * @ORM\ManyToOne(targetEntity="Manga", inversedBy="volumes")
      */
     private $manga;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="volumeNumber", type="integer")
-     *
-     * @Assert\Range(
-     *      min = 1,
-     *      minMessage = "Give number add least greater than {{ limit }}",
-     * )
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="volumes")
      */
-    private $volumeNumber;
-
-
+    private $users;
 
     /**
-     * var \DateTime
-     *
-     * ORM\Column(name="release_date", type="datetime")
+     * Volume constructor.
      */
-    #private $releaseDate;
-
-    public function __toString() {
-        return (string) $this->volumeNumber;
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -65,30 +68,28 @@ class Volume
     }
 
     /**
-     * Set volumeNumber
+     * Set number
      *
-     * @param integer $volumeNumber
+     * @param integer $number
      *
      * @return Volume
      */
-    public function setVolumeNumber($volumeNumber)
+    public function setNumber($number)
     {
-        $this->volumeNumber = $volumeNumber;
+        $this->number = $number;
 
         return $this;
     }
 
     /**
-     * Get volumeNumber
+     * Get number
      *
      * @return int
      */
-    public function getVolumeNumber()
+    public function getNumber()
     {
-        return $this->volumeNumber;
+        return $this->number;
     }
-
-
 
     /**
      * Set releaseDate
@@ -104,24 +105,41 @@ class Volume
         return $this;
     }
 
-    /*
+    /**
      * Get releaseDate
      *
      * @return \DateTime
-
+     */
     public function getReleaseDate()
     {
         return $this->releaseDate;
     }
-    */
+
     /**
-     * @param mixed $manga
+     * @return string
      */
-    public function setManga($manga)
+    public function getManga(): string
+    {
+        return $this->manga;
+    }
+
+    /**
+     * @param string $manga
+     */
+    public function setManga(Manga $manga)
     {
         $this->manga = $manga;
     }
 
+    public function addUser(User $user)
+    {
+        $this->users[] = $user;
+    }
 
+    public function popUser(User $user)
+    {
+        if(!$this->users->contains($user))return;
+         $this->users->removeElement($user);
+    }
 }
 

@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
- {{ manga.title }}
+    {{ manga.title }}
 {% endblock %}
-
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}" />
+{% endblock %}
 {% block body %}
     <h1>Manga</h1>
 
@@ -18,37 +20,53 @@
                 <td>{{ manga.title }}</td>
             </tr>
             <tr>
-                <th>Jptitle</th>
-                <td>{{ manga.jpTitle }}</td>
-            </tr>
-            <tr>
-                <th>Owner</th>
-                <td>{{ manga.user.nickname}}</td>
-            </tr>
-            <tr>
-                <th>Publisher</th>
-                <td>{{ manga.publisher }}</td>
+                <th>Author</th>
+                <td>{{ manga.author }}</td>
             </tr>
             <tr>
                 <th>Status</th>
                 <td>{{ manga.status }}</td>
             </tr>
             <tr>
-                <th>Author</th>
-                <td>{{ manga.author }}</td>
-            </tr>
-            <tr>
-                <th>Volumes</th>
-                <td>{{ manga.volumes|length }}</td>
+                <th>Views</th>
+                <td>{{ manga.views }}</td>
             </tr>
         </tbody>
     </table>
+
+    <div class="volume-container">
+        {% for volume in volumes %}
+            <div class="card volumes-cards">
+                <h4 class="card-title card-header">{{ manga.title }}: {{ volume.number }}</h4>
+                <div class="card-body">
+
+                    <h6 class="card-subtitle mb-2 text-muted">{{ "volume.releaseDate"|trans({},"volume") }}</h6>
+                    <p class="card-text">{{ volume.releaseDate|date("d/m/y") }}</p>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        {% if app.user.haveVolume(volume) %}
+                            <div class="alert alert-success">
+                                {{ "volume.owned"|trans({},'volume') }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger">
+                                {{ "volume.notOwned"|trans({},'volume') }}
+                            </div>
+                        {% endif %}
+                        {% if is_granted('IS_AUTHENTICATED_FULLY')%}
+                            <form action="{{ path("change_state",{'manga': manga.id, 'volume': volume.id })}}">
+                                <input type="submit" class="btn" value="Change State"></input>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
     <ul>
         <li>
             <a href="{{ path('manga_index') }}">Back to the list</a>
         </li>
-        {% if is_granted('ROLE_ADMIN') %}
         <li>
             <a href="{{ path('manga_edit', { 'id': manga.id }) }}">Edit</a>
         </li>
@@ -57,13 +75,5 @@
                 <input type="submit" value="Delete">
             {{ form_end(delete_form) }}
         </li>
-        {% endif %}
     </ul>
-        {% for volume in volumes %}
-            {{ render(controller('AppBundle:manga:volumeShow', {'manga': manga, 'volume': volume})) }}
-        {% endfor %}
-
-        {% if is_granted('ROLE_ADMIN') %}
-            {{ render(controller('AppBundle:manga:volumeForm', {'manga': manga})) }}
-        {% endif %}
 {% endblock %}
